@@ -1,0 +1,4 @@
+.vs/
+packages/
+MySqlOrm/bin/
+MySqlOrm/obj/
