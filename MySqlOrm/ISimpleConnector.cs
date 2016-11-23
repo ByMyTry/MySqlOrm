@@ -1,16 +1,17 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace MySqlOrm
 {
     interface ISimpleConnector
     {
-        bool Add<T>(T modelObject);
+        T Add<T>(T modelObject);//id?
 
-        bool Update<TId, TModel>(TId id, TModel modelObject);
+        bool Update<TModel>(TModel modelObject);//id через атрибут
 
         bool Remove<T>(T modelObject);
 
         IEnumerable<T> GetAll<T>();
+
+        T GetById<T>();
     }
 }
