@@ -39,13 +39,28 @@ namespace MySqlOrm
 
         public IEnumerable<T> GetAll<T>()
         {
-            throw new NotImplementedException();
-            //MySqlDataReader rdr = null;
-            /*try
+            //throw new NotImplementedException();
+            MySqlDataReader reader = null;
+            List<T> res = null;
+            try
             {
+                String commandText = "SELECT * FROM {}";
                 MySqlCommand command = new MySqlCommand();
                 command.Connection = this.connection;
-            }*/
+                command.CommandText = String.Format(commandText, typeof(T).Name.ToLower() + "s");
+                reader = command.ExecuteReader();
+                res = 
+            }
+            catch (Exception e)
+            {
+
+            }
+            finally
+            {
+                if (reader != null)
+                    reader.Dispose();
+            }
+
         }
 
         public T GetById<T>()
