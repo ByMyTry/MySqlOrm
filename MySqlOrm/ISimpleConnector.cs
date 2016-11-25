@@ -8,7 +8,7 @@ namespace MySqlOrm
 
         bool Update<TModel>(TModel modelObject);//id через атрибут
 
-        bool Remove<T>(T modelObject);
+        bool RemoveById<T>();
 
         IEnumerable<T> GetAll<T>();
 

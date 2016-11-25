@@ -18,6 +18,7 @@ namespace MySqlOrm
                 dbName
             );
             this.connection = new MySqlConnection(connectionString);
+            this.connection.Open();
         }
 
         public T Add<T>(T modelObject)
@@ -32,7 +33,7 @@ namespace MySqlOrm
             throw new NotImplementedException();
         }
 
-        public bool Remove<T>(T modelObject)
+        public bool RemoveById<T>()
         {
             throw new NotImplementedException();
         }
@@ -41,15 +42,15 @@ namespace MySqlOrm
         {
             //throw new NotImplementedException();
             MySqlDataReader reader = null;
-            List<T> res = null;
+            IEnumerable<T> res = null;
             try
             {
-                String commandText = "SELECT * FROM {}";
+                String commandText = "SELECT * FROM {0}";
                 MySqlCommand command = new MySqlCommand();
                 command.Connection = this.connection;
                 command.CommandText = String.Format(commandText, typeof(T).Name.ToLower() + "s");
                 reader = command.ExecuteReader();
-                res = 
+                res = new ModelParser<T>().ParseFrom(reader);
             }
             catch (Exception e)
             {
@@ -60,7 +61,7 @@ namespace MySqlOrm
                 if (reader != null)
                     reader.Dispose();
             }
-
+            return res;
         }
 
         public T GetById<T>()
