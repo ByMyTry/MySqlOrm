@@ -20,19 +20,18 @@ namespace MySqlOrm
             this.properties = info.GetProperties();
         }
 
-        public IEnumerable<T> ParseFrom(MySqlDataReader reader)
+        public IEnumerable<T> DeparseFrom(MySqlDataReader reader)
         {
             List<T> modelObjects = new List<T>();
             while(reader.Read())
             {
-                var modelObject = Activator.CreateInstance(typeof(T));
+                dynamic modelObject = Activator.CreateInstance(typeof(T));
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
                     PropertyInfo prop = this.properties.First(p => p.Name.ToLower().Equals(reader.GetName(i).ToLower()));
                     prop.SetValue(modelObject, reader.GetValue(i));
                 }
-                dynamic kostil = modelObject;
-                modelObjects.Add(kostil);
+                modelObjects.Add(modelObject);
             }
             return modelObjects;
         }

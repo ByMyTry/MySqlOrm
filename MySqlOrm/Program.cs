@@ -2,21 +2,10 @@
 using System.Data.SqlClient;
 using MySqlOrm.Models;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MySqlOrm
 {
-    class C
-    {
-        public int x = 2;
-
-        public string s = "3";
-
-        public override string ToString()
-        {
-            return this.x + this.s;
-        }
-    }
-
     class Program1
     {
         static void Main(string[] args)
@@ -33,15 +22,20 @@ namespace MySqlOrm
             //var o1 = Activator.CreateInstance(typeof(String),o);
 
             //Console.WriteLine(o1);
-            SimpleConnector sc = new SimpleConnector(
+            using (SimpleConnector sc = new SimpleConnector(
                  "localhost",
                  "root",
                  "1111",
                  "test_db1"
-                 );
-             IEnumerable<User> users = sc.GetAll<User>();
-             foreach (var user in users)
-                 Console.WriteLine(user.id + " " + user.name + " " + user.region_id);
+                 )
+            )
+            {
+                IEnumerable<User> users = sc.GetAll<User>();
+                foreach (var user in users)
+                    Console.WriteLine(user.Id + " " + user.Name + " " + user.Region_id);
+                User user1 = sc.GetById<User>(users.ElementAt(3).Id);
+                Console.WriteLine(user1.Id + " " + user1.Name + " " + user1.Region_id);
+            }
             Console.ReadKey();
         }
     }

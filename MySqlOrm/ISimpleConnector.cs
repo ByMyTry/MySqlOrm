@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace MySqlOrm
 {
@@ -12,6 +13,6 @@ namespace MySqlOrm
 
         IEnumerable<T> GetAll<T>();
 
-        T GetById<T>();
+        T GetById<T>(Object id);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using System;
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace MySqlOrm
 {
@@ -43,18 +44,17 @@ namespace MySqlOrm
             //throw new NotImplementedException();
             MySqlDataReader reader = null;
             IEnumerable<T> res = null;
+            ModelParser<T> mp = new ModelParser<T>();
             try
             {
-                String commandText = "SELECT * FROM {0}";
+                //
+                String commandText = "SELECT * FROM {0};";
                 MySqlCommand command = new MySqlCommand();
                 command.Connection = this.connection;
-                command.CommandText = String.Format(commandText, typeof(T).Name.ToLower() + "s");
+                command.CommandText = String.Format(commandText, mp.tableName);
+                //
                 reader = command.ExecuteReader();
-                res = new ModelParser<T>().ParseFrom(reader);
-            }
-            catch (Exception e)
-            {
-
+                res = mp.DeparseFrom(reader);
             }
             finally
             {
@@ -64,9 +64,33 @@ namespace MySqlOrm
             return res;
         }
 
-        public T GetById<T>()
+        public T GetById<T>(Object id)
         {
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            MySqlDataReader reader = null;
+            IEnumerable<T> res = null;
+            ModelParser<T> mp = new ModelParser<T>();
+            try
+            {
+                //
+                String commandText = "SELECT * FROM {0} WHERE {1} = {2};";
+                MySqlCommand command = new MySqlCommand();
+                command.Connection = this.connection;
+                String pkName = "id";   //сделать поиск по атрибуту [PrimaryKey]
+                String paramName = "@id";
+                command.CommandText = String.Format(commandText, mp.tableName, pkName, paramName);
+                MySqlParameter param = new MySqlParameter(paramName, id);
+                command.Parameters.Add(param);
+                 //
+                reader = command.ExecuteReader();
+                res = mp.DeparseFrom(reader);
+            }
+            finally
+            {
+                if (reader != null)
+                    reader.Dispose();
+            }
+            return res.FirstOrDefault<T>();
         }
 
         public void Dispose()
