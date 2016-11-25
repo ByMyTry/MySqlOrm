@@ -22,8 +22,7 @@ namespace MySqlOrm
 
         private static String EqualsFormat(String s)
         {
-            var s1 = s.ToLower().Replace("_", "");
-            return s1;
+            return s.ToLower().Replace("_", ""); ;
         }
 
         public static IEnumerable<T> DeparseFrom<T>(MySqlDataReader reader)
@@ -33,7 +32,7 @@ namespace MySqlOrm
             {
                 IEnumerable<PropertyInfo> propertiesInfo = typeof(T).GetProperties();
                 dynamic modelObject = Activator.CreateInstance(typeof(T));
-                for (int i = 0; i < reader.FieldCount; i++)
+                for (int i = 0; i < reader.FieldCount; i++) //переделать
                 {
                     PropertyInfo prop = propertiesInfo
                         .FirstOrDefault(p => EqualsFormat(p.Name).Equals(EqualsFormat(reader.GetName(i))));
@@ -46,7 +45,7 @@ namespace MySqlOrm
 
         public static String GetTableName<T>()
         {
-            return typeof(T).Name.ToLower() + "s";
+            return EqualsFormat(typeof(T).Name) + "s";
         }
 
         public static String GetPrimaryKeyName<T>()

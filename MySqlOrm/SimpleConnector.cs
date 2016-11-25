@@ -22,21 +22,24 @@ namespace MySqlOrm
             this.connection.Open();
         }
 
-        public T Add<T>(T modelObject)
+        public T Add<T>(T modelObject)//id?
         {
             throw new NotImplementedException();
             int addRecordsCount = 1;
             //return addRecordsCount == 1;
         }
 
-        public bool Update<TModel>(TModel modelObject)
+        public bool Update<T>(T modelObject)//id через атрибут
         {
             throw new NotImplementedException();
         }
 
-        public bool RemoveById<T>()
+        public bool RemoveById<T>(Object id)
         {
-            throw new NotImplementedException();
+            MySqlCommand command = CommandCreator.RemoveByIdCommand<T>(id);
+            command.Connection = this.connection;
+            int cod = command.ExecuteNonQuery();
+            return cod == 1;
         }
 
         public IEnumerable<T> GetAll<T>()
@@ -45,12 +48,8 @@ namespace MySqlOrm
             IEnumerable<T> modelObjects = null;
             try
             {
-                //
-                String commandText = "SELECT * FROM {0};";
-                MySqlCommand command = new MySqlCommand();
+                MySqlCommand command = CommandCreator.SelectCommand<T>();
                 command.Connection = this.connection;
-                command.CommandText = String.Format(commandText, ModelParser.GetTableName<T>());
-                //
                 reader = command.ExecuteReader();
                 modelObjects = ModelParser.DeparseFrom<T>(reader);
             }
@@ -68,17 +67,8 @@ namespace MySqlOrm
             IEnumerable<T> modelObjects = null;
             try
             {
-                //
-                String commandText = "SELECT * FROM {0} WHERE {1} = {2};";
-                MySqlCommand command = new MySqlCommand();
+                MySqlCommand command = CommandCreator.SelectByIdCommand<T>(id);
                 command.Connection = this.connection;
-                String pkName = ModelParser.GetPrimaryKeyName<T>();   //сделать поиск по атрибуту [PrimaryKey]
-                String paramName = "@id";
-                command.CommandText = String.Format(commandText, ModelParser.GetTableName<T>(), pkName, paramName);
-                MySqlParameter param = new MySqlParameter(paramName, id);
-                command.Parameters.Add(param);
-                //CommandCreator.GetSelectByIdCommand<User>(id);
-                //
                 reader = command.ExecuteReader();
                 modelObjects = ModelParser.DeparseFrom<T>(reader);
             }
@@ -94,7 +84,7 @@ namespace MySqlOrm
         {
             if (this.connection != null)
             {
-                this.connection.Dispose(); // вызовет Close
+                this.connection.Dispose(); // вызовет Close; Чистый Close нужен чтобы потом Open
                 this.connection = null;
             }
         }

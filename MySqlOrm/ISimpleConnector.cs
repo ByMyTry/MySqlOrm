@@ -5,11 +5,11 @@ namespace MySqlOrm
 {
     interface ISimpleConnector
     {
-        T Add<T>(T modelObject);//id?
+        T Add<T>(T modelObject);
 
-        bool Update<TModel>(TModel modelObject);//id через атрибут
+        bool Update<T>(T modelObject);
 
-        bool RemoveById<T>();
+        bool RemoveById<T>(Object id);
 
         IEnumerable<T> GetAll<T>();
 
