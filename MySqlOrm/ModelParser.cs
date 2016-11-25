@@ -6,29 +6,37 @@ using System.Reflection;
 
 namespace MySqlOrm
 {
-    class ModelParser<T>
+    public static class ModelParser
     {
-        private Type info;
+        //private Type info;
 
-        public readonly String tableName;
-        private readonly IEnumerable<PropertyInfo> properties;
+        /*public readonly String tableName;
+        private readonly IEnumerable<PropertyInfo> properties;*/
 
-        public ModelParser()
+        /*public ModelParser()
         {
             this.info = typeof(T);
             this.tableName = info.Name.ToLower() + "s";
             this.properties = info.GetProperties();
+        }*/
+
+        private static String EqualsFormat(String s)
+        {
+            var s1 = s.ToLower().Replace("_", "");
+            return s1;
         }
 
-        public IEnumerable<T> DeparseFrom(MySqlDataReader reader)
+        public static IEnumerable<T> DeparseFrom<T>(MySqlDataReader reader)
         {
             List<T> modelObjects = new List<T>();
             while(reader.Read())
             {
+                IEnumerable<PropertyInfo> propertiesInfo = typeof(T).GetProperties();
                 dynamic modelObject = Activator.CreateInstance(typeof(T));
                 for (int i = 0; i < reader.FieldCount; i++)
                 {
-                    PropertyInfo prop = this.properties.First(p => p.Name.ToLower().Equals(reader.GetName(i).ToLower()));
+                    PropertyInfo prop = propertiesInfo
+                        .FirstOrDefault(p => EqualsFormat(p.Name).Equals(EqualsFormat(reader.GetName(i))));
                     prop.SetValue(modelObject, reader.GetValue(i));
                 }
                 modelObjects.Add(modelObject);
@@ -36,10 +44,18 @@ namespace MySqlOrm
             return modelObjects;
         }
 
-        /*public String GetTableName()
+        public static String GetTableName<T>()
         {
-            return info.Name.ToLower() + "s";//typeof(T).Name.ToLower() + "s"
-        }*/
+            return typeof(T).Name.ToLower() + "s";
+        }
+
+        public static String GetPrimaryKeyName<T>()
+        {
+            PropertyInfo prop = typeof(T)
+                .GetProperties()
+                .FirstOrDefault(p => p.GetCustomAttributes(typeof(PrimaryKeyAttribute), false).Length > 0);
+            return EqualsFormat(prop.Name);
+        }
 
         /*public IEnumerable<String> GetPropNames()
         {

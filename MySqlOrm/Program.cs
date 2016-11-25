@@ -10,18 +10,6 @@ namespace MySqlOrm
     {
         static void Main(string[] args)
         {
-            /*Type t = typeof(String);
-            Console.WriteLine(Type.GetType(""));
-            Object o = new C();
-            Console.WriteLine(o.ToString());*/
-
-            //sasmorotrun
-            /*Type t = typeof(SqlDataReader);
-            foreach (var f in t.GetMethods())
-                if(f.Name.EndsWith(typeof(Int32).Name)  && f.Name.StartsWith("Get")) Console.WriteLine(f.Name);*/
-            //var o1 = Activator.CreateInstance(typeof(String),o);
-
-            //Console.WriteLine(o1);
             using (SimpleConnector sc = new SimpleConnector(
                  "localhost",
                  "root",
@@ -32,9 +20,12 @@ namespace MySqlOrm
             {
                 IEnumerable<User> users = sc.GetAll<User>();
                 foreach (var user in users)
-                    Console.WriteLine(user.Id + " " + user.Name + " " + user.Region_id);
+                    Console.WriteLine(user.Id + " " + user.Name + " " + user.RegionId);
+
                 User user1 = sc.GetById<User>(users.ElementAt(3).Id);
-                Console.WriteLine(user1.Id + " " + user1.Name + " " + user1.Region_id);
+                Console.WriteLine(user1.Id + " " + user1.Name + " " + user1.RegionId);
+
+                Console.WriteLine(ModelParser.GetPrimaryKeyName<User>());
             }
             Console.ReadKey();
         }

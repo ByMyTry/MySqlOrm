@@ -41,56 +41,53 @@ namespace MySqlOrm
 
         public IEnumerable<T> GetAll<T>()
         {
-            //throw new NotImplementedException();
             MySqlDataReader reader = null;
-            IEnumerable<T> res = null;
-            ModelParser<T> mp = new ModelParser<T>();
+            IEnumerable<T> modelObjects = null;
             try
             {
                 //
                 String commandText = "SELECT * FROM {0};";
                 MySqlCommand command = new MySqlCommand();
                 command.Connection = this.connection;
-                command.CommandText = String.Format(commandText, mp.tableName);
+                command.CommandText = String.Format(commandText, ModelParser.GetTableName<T>());
                 //
                 reader = command.ExecuteReader();
-                res = mp.DeparseFrom(reader);
+                modelObjects = ModelParser.DeparseFrom<T>(reader);
             }
             finally
             {
                 if (reader != null)
                     reader.Dispose();
             }
-            return res;
+            return modelObjects;
         }
 
         public T GetById<T>(Object id)
         {
-            //throw new NotImplementedException();
             MySqlDataReader reader = null;
-            IEnumerable<T> res = null;
-            ModelParser<T> mp = new ModelParser<T>();
+            IEnumerable<T> modelObjects = null;
             try
             {
                 //
                 String commandText = "SELECT * FROM {0} WHERE {1} = {2};";
                 MySqlCommand command = new MySqlCommand();
                 command.Connection = this.connection;
-                String pkName = "id";   //сделать поиск по атрибуту [PrimaryKey]
+                String pkName = ModelParser.GetPrimaryKeyName<T>();   //сделать поиск по атрибуту [PrimaryKey]
                 String paramName = "@id";
-                command.CommandText = String.Format(commandText, mp.tableName, pkName, paramName);
+                command.CommandText = String.Format(commandText, ModelParser.GetTableName<T>(), pkName, paramName);
                 MySqlParameter param = new MySqlParameter(paramName, id);
                 command.Parameters.Add(param);
-                 //
+                //CommandCreator.GetSelectByIdCommand<User>(id);
+                //
                 reader = command.ExecuteReader();
-                res = mp.DeparseFrom(reader);
+                modelObjects = ModelParser.DeparseFrom<T>(reader);
             }
             finally
             {
                 if (reader != null)
                     reader.Dispose();
             }
-            return res.FirstOrDefault<T>();
+            return modelObjects.FirstOrDefault<T>();
         }
 
         public void Dispose()
@@ -101,5 +98,6 @@ namespace MySqlOrm
                 this.connection = null;
             }
         }
+        
     }
 }

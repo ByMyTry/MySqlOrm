@@ -2,8 +2,11 @@
 {
     class User
     {
+        [PrimaryKey]
         public int Id { get; set; }
+
         public string Name { get; set; }
-        public int Region_id { get; set; }
+
+        public int RegionId { get; set; }
     }
 }
