@@ -27,8 +27,13 @@ namespace MySqlOrm
             MySqlCommand command = CommandCreator.AddCommand<T>(modelObject);
             command.Connection = this.connection;
             command.ExecuteNonQuery();
-            Object id = command.LastInsertedId;
-            return GetById<T>(id);
+            if (ModelParser.GetPrimaryKeyName<T>() != null)
+            {
+                Object id = command.LastInsertedId;
+                return GetById<T>(id);
+            }
+            else
+                return modelObject;
         }
 
         public bool Update<T>(T modelObject)//id через атрибут
