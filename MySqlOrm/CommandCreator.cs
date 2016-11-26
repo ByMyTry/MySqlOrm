@@ -35,18 +35,23 @@ namespace MySqlOrm
 
         public static MySqlCommand RemoveByIdCommand<T>(Object id)
         {
-            String commandText = "DELETE FROM {0} WHERE {1} = {2};";            
-            String tableName = ModelParser.GetTableName<T>();
-            String pkName = ModelParser.GetPrimaryKeyName<T>();
-            String paramName = "@id";
+            if (ModelParser.GetPrimaryKeyName<T>() != null)
+            {
+                String commandText = "DELETE FROM {0} WHERE {1} = {2};";
+                String tableName = ModelParser.GetTableName<T>();
+                String pkName = ModelParser.GetPrimaryKeyName<T>();
+                String paramName = "@id";
 
-            MySqlCommand command = new MySqlCommand();
-            command.CommandText = String.Format(commandText, tableName, pkName, paramName);
+                MySqlCommand command = new MySqlCommand();
+                command.CommandText = String.Format(commandText, tableName, pkName, paramName);
 
-            MySqlParameter param = new MySqlParameter(paramName, id);
-            command.Parameters.Add(param);
+                MySqlParameter param = new MySqlParameter(paramName, id);
+                command.Parameters.Add(param);
 
-            return command;
+                return command;
+            }
+            else
+                throw new System.Exception(String.Format("{0} has no Primary Key",typeof(T).Name));
         }
 
         public static MySqlCommand SelectCommand<T>()
@@ -62,18 +67,23 @@ namespace MySqlOrm
 
         public static MySqlCommand SelectByIdCommand<T>(Object id)
         {
-            String commandText = "SELECT * FROM {0} WHERE {1} = {2};";
-            String tableName = ModelParser.GetTableName<T>();
-            String pkName = ModelParser.GetPrimaryKeyName<T>();
-            String paramName = "@id";
+            if (ModelParser.GetPrimaryKeyName<T>() != null)
+            {
+                String commandText = "SELECT * FROM {0} WHERE {1} = {2};";
+                String tableName = ModelParser.GetTableName<T>();
+                String pkName = ModelParser.GetPrimaryKeyName<T>();
+                String paramName = "@id";
 
-            MySqlCommand command = new MySqlCommand();
-            command.CommandText = String.Format(commandText, tableName, pkName, paramName);
+                MySqlCommand command = new MySqlCommand();
+                command.CommandText = String.Format(commandText, tableName, pkName, paramName);
 
-            MySqlParameter param = new MySqlParameter(paramName, id);
-            command.Parameters.Add(param);
+                MySqlParameter param = new MySqlParameter(paramName, id);
+                command.Parameters.Add(param);
 
-            return command;
+                return command;
+            }
+            else
+                throw new System.Exception(String.Format("{0} has no Primary Key", typeof(T).Name));
         }
     }
 }

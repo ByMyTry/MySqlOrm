@@ -2,7 +2,6 @@
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Linq;
-using System.Data;
 
 namespace MySqlOrm
 {
@@ -30,7 +29,7 @@ namespace MySqlOrm
             command.ExecuteNonQuery();
             Object id = command.LastInsertedId;
             return GetById<T>(id);
-            }
+        }
 
         public bool Update<T>(T modelObject)//id через атрибут
         {

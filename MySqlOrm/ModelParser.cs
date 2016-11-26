@@ -36,7 +36,10 @@ namespace MySqlOrm
             PropertyInfo prop = typeof(T)
                 .GetProperties()
                 .FirstOrDefault(p => p.GetCustomAttributes(typeof(PrimaryKeyAttribute), false).Length > 0);
-            return EqualsFormat(prop.Name);
+            if (prop.Name != null)
+                return EqualsFormat(prop.Name);
+            else
+                return null;
         }
 
         public static T SetPrimaryKey<T>(T modelObject,Object value)
@@ -71,8 +74,14 @@ namespace MySqlOrm
             Dictionary<String, Object> namesValuesDict = new Dictionary<String, Object>();
 
             IEnumerable<PropertyInfo> propertiesInfo = typeof(T).GetProperties();
-            foreach(var propInfo in propertiesInfo)
-                if(!EqualsFormat(propInfo.Name).Equals(GetPrimaryKeyName<T>()))
+            if (GetPrimaryKeyName<T>() != null)
+            {
+                foreach (var propInfo in propertiesInfo)
+                    if (!EqualsFormat(propInfo.Name).Equals(GetPrimaryKeyName<T>()))
+                        namesValuesDict.Add(propInfo.Name, propInfo.GetValue(modelObject));
+            }
+            else
+                foreach (var propInfo in propertiesInfo)
                     namesValuesDict.Add(propInfo.Name, propInfo.GetValue(modelObject));
 
             return namesValuesDict;
