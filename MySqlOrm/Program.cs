@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Data.SqlClient;
 using MySqlOrm.Models;
 using System.Collections.Generic;
 using System.Linq;
@@ -19,13 +18,13 @@ namespace MySqlOrm
             )
             {
                 //GetAll//
-                IEnumerable<User> users = sc.GetAll<User>();
+                /*IEnumerable<User> users = sc.GetAll<User>();
                 foreach (var user in users)
-                    Console.WriteLine(user.Id + " " + user.Name + " " + user.Region_Id);
+                    Console.WriteLine(user.Id + "\t " + user.Name + "\t " + user.Region_Id);*/
 
                 //GetById//
-                User user1 = sc.GetById<User>(users.ElementAt(2).Id);
-                Console.WriteLine(user1.Id + " " + user1.Name + " " + user1.Region_Id);
+                /*User user1 = sc.GetById<User>(users.ElementAt(2).Id);
+                 Console.WriteLine(user1.Id + "\t " + user1.Name + "\t " + user1.Region_Id);*/
 
                 //PrimaryKey//
                 //Console.WriteLine(ModelParser.GetPrimaryKeyName<User>());
@@ -43,7 +42,15 @@ namespace MySqlOrm
                 Console.WriteLine(user1.Id + " " + user1.Name + " " + user1.Region_Id);*/
 
                 //Update//
-
+                /* user1.Name = "lololo";
+                 Console.WriteLine(sc.Update<User>(user1));
+                 //Console.WriteLine(CommandCreator.UpdateCommand<User>(user1).CommandText);
+                 users = sc.GetAll<User>();
+                 foreach (var user in users)
+                     Console.WriteLine(user.Id + " " + user.Name + " " + user.Region_Id);*/
+                User u = new User() {Name = "test", Region_Id = 2 };
+                u = sc.GetById<User>(19);
+                sc.RemoveById<User>(3);
             }
             Console.ReadKey();
         }

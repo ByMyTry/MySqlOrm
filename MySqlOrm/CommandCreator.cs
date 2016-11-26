@@ -9,14 +9,14 @@ namespace MySqlOrm
     {
         public static MySqlCommand AddCommand<T>(T modelObject)
         {
-            String commandText = "INSERT INTO {0} {1} VALUES {2};";// SET @id = LAST_INSERT_ID()";   
+            String commandText = "INSERT INTO {0} {1} VALUES {2};";  
             String tableName = ModelParser.GetTableName<T>();
             var propDict = ModelParser.Parse<T>(modelObject);
-            String fieldsNames = "(" + String.Join(", ", propDict.Keys) + ")";
-            String fieldsParams = "(" + String.Join(", ", propDict.Keys.Select(n => "@" + n)) + ")";
+            String propNames = "(" + String.Join(", ", propDict.Keys) + ")";
+            String propParams = "(" + String.Join(", ", propDict.Keys.Select(n => "@" + n)) + ")";
 
             MySqlCommand command = new MySqlCommand();
-            command.CommandText = String.Format(commandText, tableName, fieldsNames, fieldsParams);
+            command.CommandText = String.Format(commandText, tableName, propNames, propParams);
 
             foreach(var prop in propDict)
             {
@@ -26,12 +26,45 @@ namespace MySqlOrm
 
             return command;
         }
-
-        /*
-        public static MySqlCommand UpdateCommand<T>()
+        
+        public static MySqlCommand UpdateCommand<T>(T modelObject)
         {
-            
-        }*/
+            if (ModelParser.GetPrimaryKeyName<T>() != null)
+            {
+                String commandText = "UPDATE {0} SET {1} WHERE {2};";
+                String tableName = ModelParser.GetTableName<T>();
+                var propDict = ModelParser.Parse<T>(modelObject);
+                var propNames = propDict.Keys.Select(n => n + " = @" + n);
+                String propParams = String.Join(", ", propNames);
+                String pkName = ModelParser.GetPrimaryKeyName<T>();
+
+                MySqlCommand command = new MySqlCommand();
+                command.CommandText = String.Format(commandText, tableName, propParams, pkName + " = @" + pkName);
+                foreach (var prop in propDict)
+                    command.Parameters.AddWithValue("@" + prop.Key, prop.Value);
+                command.Parameters.AddWithValue("@" + pkName, ModelParser.GetPrimaryKeyValue<T>(modelObject));
+
+                return command;
+            }
+            else
+                throw new Exception(String.Format("{0} has no Primary Key", typeof(T).Name));
+        }
+
+        public static MySqlCommand RemoveCommand<T>(T modelObject)
+        {
+            String commandText = "DELETE FROM {0} WHERE {1};";
+            String tableName = ModelParser.GetTableName<T>();
+            var propDict = ModelParser.Parse<T>(modelObject);
+            var propNames = propDict.Keys.Select(n => n + " = @" + n);
+            String propParams = String.Join(" AND ", propNames);
+
+            MySqlCommand command = new MySqlCommand();
+            command.CommandText = String.Format(commandText, tableName, propParams);
+            foreach (var prop in propDict)
+                command.Parameters.AddWithValue("@" + prop.Key, prop.Value);
+
+            return command;
+        }
 
         public static MySqlCommand RemoveByIdCommand<T>(Object id)
         {
@@ -40,18 +73,17 @@ namespace MySqlOrm
                 String commandText = "DELETE FROM {0} WHERE {1} = {2};";
                 String tableName = ModelParser.GetTableName<T>();
                 String pkName = ModelParser.GetPrimaryKeyName<T>();
-                String paramName = "@id";
 
                 MySqlCommand command = new MySqlCommand();
-                command.CommandText = String.Format(commandText, tableName, pkName, paramName);
+                command.CommandText = String.Format(commandText, tableName, pkName, "@" + pkName);
 
-                MySqlParameter param = new MySqlParameter(paramName, id);
+                MySqlParameter param = new MySqlParameter("@" + pkName, id);
                 command.Parameters.Add(param);
 
                 return command;
             }
             else
-                throw new System.Exception(String.Format("{0} has no Primary Key",typeof(T).Name));
+                throw new Exception(String.Format("{0} has no Primary Key",typeof(T).Name));
         }
 
         public static MySqlCommand SelectCommand<T>()
@@ -72,18 +104,17 @@ namespace MySqlOrm
                 String commandText = "SELECT * FROM {0} WHERE {1} = {2};";
                 String tableName = ModelParser.GetTableName<T>();
                 String pkName = ModelParser.GetPrimaryKeyName<T>();
-                String paramName = "@id";
 
                 MySqlCommand command = new MySqlCommand();
-                command.CommandText = String.Format(commandText, tableName, pkName, paramName);
+                command.CommandText = String.Format(commandText, tableName, pkName, "@" + pkName);
 
-                MySqlParameter param = new MySqlParameter(paramName, id);
+                MySqlParameter param = new MySqlParameter("@" + pkName, id);
                 command.Parameters.Add(param);
 
                 return command;
             }
             else
-                throw new System.Exception(String.Format("{0} has no Primary Key", typeof(T).Name));
+                throw new Exception(String.Format("{0} has no Primary Key", typeof(T).Name));
         }
     }
 }

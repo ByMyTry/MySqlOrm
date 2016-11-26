@@ -36,8 +36,19 @@ namespace MySqlOrm
             PropertyInfo prop = typeof(T)
                 .GetProperties()
                 .FirstOrDefault(p => p.GetCustomAttributes(typeof(PrimaryKeyAttribute), false).Length > 0);
-            if (prop.Name != null)
+            if (prop != null)
                 return EqualsFormat(prop.Name);
+            else
+                return null;
+        }
+
+        public static Object GetPrimaryKeyValue<T>(T modelObject)
+        {
+            PropertyInfo prop = typeof(T)
+                .GetProperties()
+                .FirstOrDefault(p => p.GetCustomAttributes(typeof(PrimaryKeyAttribute), false).Length > 0);
+            if (prop != null)
+                return prop.GetValue(modelObject);
             else
                 return null;
         }
@@ -51,7 +62,7 @@ namespace MySqlOrm
             return modelObject;
         }
 
-        public static IEnumerable<T> DeparseFrom<T>(MySqlDataReader reader)
+        public static IEnumerable<T> Deparse<T>(MySqlDataReader reader)
         {
             List<T> modelObjects = new List<T>();
             while(reader.Read())

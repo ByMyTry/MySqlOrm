@@ -33,7 +33,18 @@ namespace MySqlOrm
 
         public bool Update<T>(T modelObject)//id через атрибут
         {
-            throw new NotImplementedException();
+            MySqlCommand command = CommandCreator.UpdateCommand<T>(modelObject);
+            command.Connection = this.connection;
+            int cod = command.ExecuteNonQuery();
+            return cod == 1;
+        }
+
+        public bool Remove<T>(T modelObject)
+        {
+            MySqlCommand command = CommandCreator.RemoveCommand<T>(modelObject);
+            command.Connection = this.connection;
+            int cod = command.ExecuteNonQuery();
+            return cod == 1;
         }
 
         public bool RemoveById<T>(Object id)
@@ -53,7 +64,9 @@ namespace MySqlOrm
                 MySqlCommand command = CommandCreator.SelectCommand<T>();
                 command.Connection = this.connection;
                 reader = command.ExecuteReader();
-                modelObjects = ModelParser.DeparseFrom<T>(reader);
+                if (reader == null)
+                    throw new Exception(String.Format("{0}s not found", typeof(T).Name));
+                modelObjects = ModelParser.Deparse<T>(reader);
             }
             finally
             {
@@ -72,7 +85,9 @@ namespace MySqlOrm
                 MySqlCommand command = CommandCreator.SelectByIdCommand<T>(id);
                 command.Connection = this.connection;
                 reader = command.ExecuteReader();
-                modelObjects = ModelParser.DeparseFrom<T>(reader);
+                if (reader == null)
+                    throw new Exception(String.Format("{0} with pk = {1}, not found", typeof(T).Name, id));
+                modelObjects = ModelParser.Deparse<T>(reader);
             }
             finally
             {

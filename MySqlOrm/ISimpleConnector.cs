@@ -9,6 +9,8 @@ namespace MySqlOrm
 
         bool Update<T>(T modelObject);
 
+        bool Remove<T>(T modelObject);
+
         bool RemoveById<T>(Object id);
 
         IEnumerable<T> GetAll<T>();
