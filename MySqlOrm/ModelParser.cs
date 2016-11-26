@@ -22,26 +22,9 @@ namespace MySqlOrm
 
         private static String EqualsFormat(String s)
         {
-            return s.ToLower().Replace("_", ""); ;
+            return s.ToLower().Replace("_", "");
         }
 
-        public static IEnumerable<T> DeparseFrom<T>(MySqlDataReader reader)
-        {
-            List<T> modelObjects = new List<T>();
-            while(reader.Read())
-            {
-                IEnumerable<PropertyInfo> propertiesInfo = typeof(T).GetProperties();
-                dynamic modelObject = Activator.CreateInstance(typeof(T));
-                for (int i = 0; i < reader.FieldCount; i++) //переделать
-                {
-                    PropertyInfo prop = propertiesInfo
-                        .FirstOrDefault(p => EqualsFormat(p.Name).Equals(EqualsFormat(reader.GetName(i))));
-                    prop.SetValue(modelObject, reader.GetValue(i));
-                }
-                modelObjects.Add(modelObject);
-            }
-            return modelObjects;
-        }
 
         public static String GetTableName<T>()
         {
@@ -54,6 +37,45 @@ namespace MySqlOrm
                 .GetProperties()
                 .FirstOrDefault(p => p.GetCustomAttributes(typeof(PrimaryKeyAttribute), false).Length > 0);
             return EqualsFormat(prop.Name);
+        }
+
+        public static T SetPrimaryKey<T>(T modelObject,Object value)
+        {
+            PropertyInfo prop = typeof(T)
+                .GetProperties()
+                .FirstOrDefault(p => p.GetCustomAttributes(typeof(PrimaryKeyAttribute), false).Length > 0);
+            prop.SetValue(modelObject, value);
+            return modelObject;
+        }
+
+        public static IEnumerable<T> DeparseFrom<T>(MySqlDataReader reader)
+        {
+            List<T> modelObjects = new List<T>();
+            while(reader.Read())
+            {
+                IEnumerable<PropertyInfo> propertiesInfo = typeof(T).GetProperties();
+                dynamic modelObject = Activator.CreateInstance(typeof(T));
+                for (int i = 0; i < reader.FieldCount; i++) //переделать 
+                {
+                    PropertyInfo prop = propertiesInfo
+                        .FirstOrDefault(p => EqualsFormat(p.Name).Equals(EqualsFormat(reader.GetName(i))));
+                    prop.SetValue(modelObject, reader.GetValue(i));
+                }
+                modelObjects.Add(modelObject);
+            }
+            return modelObjects;
+        }
+
+        public static Dictionary<String, Object> Parse<T>(T modelObject)
+        {
+            Dictionary<String, Object> namesValuesDict = new Dictionary<String, Object>();
+
+            IEnumerable<PropertyInfo> propertiesInfo = typeof(T).GetProperties();
+            foreach(var propInfo in propertiesInfo)
+                if(!EqualsFormat(propInfo.Name).Equals(GetPrimaryKeyName<T>()))
+                    namesValuesDict.Add(propInfo.Name, propInfo.GetValue(modelObject));
+
+            return namesValuesDict;
         }
 
         /*public IEnumerable<String> GetPropNames()

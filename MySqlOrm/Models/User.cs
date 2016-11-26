@@ -7,6 +7,6 @@
 
         public string Name { get; set; }
 
-        public int RegionId { get; set; }
+        public int Region_Id { get; set; }
     }
 }

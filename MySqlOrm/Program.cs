@@ -21,22 +21,26 @@ namespace MySqlOrm
                 //GetAll//
                 IEnumerable<User> users = sc.GetAll<User>();
                 foreach (var user in users)
-                    Console.WriteLine(user.Id + " " + user.Name + " " + user.RegionId);
+                    Console.WriteLine(user.Id + " " + user.Name + " " + user.Region_Id);
 
                 //GetById//
-                User user1 = sc.GetById<User>(users.ElementAt(3).Id);
-                Console.WriteLine(user1.Id + " " + user1.Name + " " + user1.RegionId);
+                User user1 = sc.GetById<User>(users.ElementAt(2).Id);
+                Console.WriteLine(user1.Id + " " + user1.Name + " " + user1.Region_Id);
 
                 //PrimaryKey//
                 Console.WriteLine(ModelParser.GetPrimaryKeyName<User>());
 
                 //Remove//
                 Console.WriteLine(sc.RemoveById<User>(4));
-
-                //GetAll//
+                
                 users = sc.GetAll<User>();
                 foreach (var user in users)
-                    Console.WriteLine(user.Id + " " + user.Name + " " + user.RegionId);
+                    Console.WriteLine(user.Id + " " + user.Name + " " + user.Region_Id);
+
+                //Insert//
+                /*user1 = sc.Add<User>(new User { Name = "nw", Region_Id = 2 });
+                Console.WriteLine(user1.Id + " " + user1.Name + " " + user1.Region_Id);*/
+                //Update//
             }
             Console.ReadKey();
         }

@@ -2,6 +2,7 @@
 using MySql.Data.MySqlClient;
 using System.Collections.Generic;
 using System.Linq;
+using System.Data;
 
 namespace MySqlOrm
 {
@@ -24,9 +25,19 @@ namespace MySqlOrm
 
         public T Add<T>(T modelObject)//id?
         {
-            throw new NotImplementedException();
-            int addRecordsCount = 1;
-            //return addRecordsCount == 1;
+            MySqlCommand command = CommandCreator.AddCommand<T>(modelObject);
+            /*MySqlParameter idParam = new MySqlParameter
+            {
+                ParameterName = "@id",
+                MySqlDbType = MySqlDbType.Int32, 
+                Direction = ParameterDirection.Output // параметр выходной
+            };
+            command.Parameters.Add(idParam);*/
+            command.Connection = this.connection;
+            command.ExecuteNonQuery();
+            //ModelParser.SetPrimaryKey<T>(modelObject,idParam);
+
+            return modelObject;
         }
 
         public bool Update<T>(T modelObject)//id через атрибут
