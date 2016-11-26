@@ -23,22 +23,14 @@ namespace MySqlOrm
             this.connection.Open();
         }
 
-        public T Add<T>(T modelObject)//id?
+        public T Add<T>(T modelObject)// а что если таблица без id?
         {
             MySqlCommand command = CommandCreator.AddCommand<T>(modelObject);
-            /*MySqlParameter idParam = new MySqlParameter
-            {
-                ParameterName = "@id",
-                MySqlDbType = MySqlDbType.Int32, 
-                Direction = ParameterDirection.Output // параметр выходной
-            };
-            command.Parameters.Add(idParam);*/
             command.Connection = this.connection;
             command.ExecuteNonQuery();
-            //ModelParser.SetPrimaryKey<T>(modelObject,idParam);
-
-            return modelObject;
-        }
+            Object id = command.LastInsertedId;
+            return GetById<T>(id);
+            }
 
         public bool Update<T>(T modelObject)//id через атрибут
         {

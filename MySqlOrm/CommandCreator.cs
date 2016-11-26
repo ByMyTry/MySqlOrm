@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Linq;
 using MySql.Data.MySqlClient;
+using System.Data;
 
 namespace MySqlOrm
 {
@@ -8,7 +9,7 @@ namespace MySqlOrm
     {
         public static MySqlCommand AddCommand<T>(T modelObject)
         {
-            String commandText = "INSERT INTO {0} {1} VALUES {2};";// SET @id=SCOPE_IDENTITY();";   
+            String commandText = "INSERT INTO {0} {1} VALUES {2};";// SET @id = LAST_INSERT_ID()";   
             String tableName = ModelParser.GetTableName<T>();
             var propDict = ModelParser.Parse<T>(modelObject);
             String fieldsNames = "(" + String.Join(", ", propDict.Keys) + ")";
