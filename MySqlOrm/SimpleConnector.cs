@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace MySqlOrm
 {
-    class SimpleConnector : IDisposable, ISimpleConnector
+    public class SimpleConnector : IDisposable, ISimpleConnector
     {
         private MySqlConnection connection = null;
 

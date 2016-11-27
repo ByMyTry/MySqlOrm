@@ -50,7 +50,7 @@ namespace MySqlOrm
                      Console.WriteLine(user.Id + " " + user.Name + " " + user.Region_Id);*/
                 User u = new User() {Name = "test", Region_Id = 2 };
                 u = sc.GetById<User>(19);
-                sc.RemoveById<User>(3);
+                sc.RemoveById<User>(2);
             }
             Console.ReadKey();
         }

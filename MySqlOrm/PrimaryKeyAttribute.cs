@@ -3,7 +3,7 @@
 namespace MySqlOrm
 {
     [AttributeUsage(AttributeTargets.Property)]
-    class PrimaryKeyAttribute : Attribute
+    public class PrimaryKeyAttribute : Attribute
     {
 
     }
