@@ -88,11 +88,13 @@ namespace MySqlOrm
 
         public static MySqlCommand SelectCommand<T>()
         {
-            String commandText = "SELECT * FROM {0};";
+            String commandText = "SELECT {0} FROM {1};";
+            var namesList = ModelParser.Parse<T>();
+            String props = String.Join(", ", namesList);
             String tableName = ModelParser.GetTableName<T>();
 
             MySqlCommand command = new MySqlCommand();
-            command.CommandText = String.Format(commandText, tableName);
+            command.CommandText = String.Format(commandText, props, tableName);
 
             return command;
         }
@@ -101,12 +103,14 @@ namespace MySqlOrm
         {
             if (ModelParser.GetPrimaryKeyName<T>() != null)
             {
-                String commandText = "SELECT * FROM {0} WHERE {1} = {2};";
+                String commandText = "SELECT {0} FROM {1} WHERE {2} = {3};";
+                var namesList = ModelParser.Parse<T>();
+                String props = String.Join(", ", namesList);
                 String tableName = ModelParser.GetTableName<T>();
                 String pkName = ModelParser.GetPrimaryKeyName<T>();
 
                 MySqlCommand command = new MySqlCommand();
-                command.CommandText = String.Format(commandText, tableName, pkName, "@" + pkName);
+                command.CommandText = String.Format(commandText, props, tableName, pkName, "@" + pkName);
 
                 MySqlParameter param = new MySqlParameter("@" + pkName, id);
                 command.Parameters.Add(param);

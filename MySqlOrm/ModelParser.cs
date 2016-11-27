@@ -64,8 +64,9 @@ namespace MySqlOrm
 
         public static IEnumerable<T> Deparse<T>(MySqlDataReader reader)
         {
-            List<T> modelObjects = new List<T>();
-            while(reader.Read())
+            //List<T> modelObjects = new List<T>();
+            object modelObjects = Activator.CreateInstance(typeof(List<>).MakeGenericType(new Type[]{typeof(T)}));
+            while (reader.Read())
             {
                 IEnumerable<PropertyInfo> propertiesInfo = typeof(T).GetProperties();
                 dynamic modelObject = Activator.CreateInstance(typeof(T));
@@ -75,12 +76,13 @@ namespace MySqlOrm
                         .FirstOrDefault(p => EqualsFormat(p.Name).Equals(EqualsFormat(reader.GetName(i))));
                     prop.SetValue(modelObject, reader.GetValue(i));
                 }
-                modelObjects.Add(modelObject);
+                //modelObjects.Add(modelObject);
+                modelObjects.GetType().GetMethod("Add").Invoke(modelObjects, new[] { modelObject });
             }
-            return modelObjects;
+            return (IEnumerable<T>)modelObjects;
         }
 
-        public static Dictionary<String, Object> Parse<T>(T modelObject)
+        public static Dictionary<String, Object> Parse<T>(T modelObject)//for insert/update/remove
         {
             Dictionary<String, Object> namesValuesDict = new Dictionary<String, Object>();
 
@@ -98,23 +100,15 @@ namespace MySqlOrm
             return namesValuesDict;
         }
 
-        /*public IEnumerable<String> GetPropNames()
+        public static IEnumerable<String> Parse<T>()//for select
         {
-            return info.GetProperties().Select(p => p.Name);
-        }
+            List<String> namesList = new List<String>();
 
-        public dynamic GetPropValueByName(String Name)
-        {
-            foreach(var property in info.GetProperties())
-            {
-                if (property.Name.ToLower().Equals(Name.ToLower()))
-                {
-                    dynamic propValue = property.GetValue(this.modelObject);
-                    property.SetValue(,);
-                    return propValue; //нужен сериализатор (switch)
-                }
-            }
-            return null;
-        }*/
+            IEnumerable<PropertyInfo> propertiesInfo = typeof(T).GetProperties();
+            foreach (var propInfo in propertiesInfo)
+                    namesList.Add(propInfo.Name);
+
+            return namesList;
+        }
     }
 }
